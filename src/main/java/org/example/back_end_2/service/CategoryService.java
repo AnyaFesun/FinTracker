@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class CategoryService {
@@ -23,8 +24,15 @@ public class CategoryService {
         categories.add(category);
     }
 
-    public void deleteCategory(Long categoryId) {
-        categories.removeIf(category -> category.getId().equals(categoryId));
-    }
+    public boolean deleteCategoryById(Long categoryId) {
+        Optional<Category> categoryToDelete = categories.stream()
+                .filter(category -> category.getId().equals(categoryId))
+                .findFirst();
 
+        if (categoryToDelete.isPresent()) {
+            categories.remove(categoryToDelete.get());
+            return true;
+        }
+        return false;
+    }
 }
