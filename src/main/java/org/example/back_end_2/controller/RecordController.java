@@ -21,8 +21,11 @@ public class RecordController {
     }
 
     @PostMapping
-    public void createRecord(@RequestBody Record record) {
+    public void createRecord(@RequestParam Long userId, @RequestParam Long categoryId, @RequestBody Record record) {
+        record.setUserId(userId);
+        record.setCategoryId(categoryId);
         record.setCreationDate(LocalDateTime.now());
+
         recordService.addRecord(record);
     }
 
