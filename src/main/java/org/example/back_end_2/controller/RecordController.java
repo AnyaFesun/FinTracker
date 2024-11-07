@@ -3,11 +3,12 @@ package org.example.back_end_2.controller;
 import org.example.back_end_2.model.Record;
 import org.example.back_end_2.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/record")
@@ -19,19 +20,15 @@ public class RecordController {
     public RecordController(RecordService recordService) {
         this.recordService = recordService;
     }
-
     @PostMapping
-    public void createRecord(@RequestParam Long userId, @RequestParam Long categoryId, @RequestBody Record record) {
-        record.setUserId(userId);
-        record.setCategoryId(categoryId);
-        record.setCreationDate(LocalDateTime.now());
-
-        recordService.addRecord(record);
+    public ResponseEntity<Record> createRecord(@RequestParam Long userId, @RequestParam Long categoryId, @RequestParam Double costs) {
+        Record record = recordService.addRecord(userId, categoryId, costs);
+        return ResponseEntity.status(HttpStatus.CREATED).body(record);
     }
 
     @GetMapping("/{recordId}")
     public Optional<Record> getRecord(@PathVariable Long recordId) {
-        return recordService.getRecordById(recordId);
+        return Optional.ofNullable(recordService.getRecordById(recordId));
     }
 
     @DeleteMapping("/{recordId}")

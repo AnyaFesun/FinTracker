@@ -19,13 +19,13 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public void createUser(@RequestBody User user) {
-        userService.addUser(user);
+    public User createUser(@RequestParam String name) {
+        return userService.addUser(name);
     }
 
     @GetMapping("/user/{userId}")
     public Optional<User> getUser(@PathVariable Long userId) {
-        return userService.getUserById(userId);
+        return Optional.ofNullable(userService.getUserById(userId));
     }
 
     @DeleteMapping("/user/{userId}")
