@@ -5,34 +5,31 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class CategoryService {
-    private List<Category> categories = new ArrayList<>();
+    private final Map<Long, Category> categories = new ConcurrentHashMap<>();
+    private final AtomicLong categoryIdCounter = new AtomicLong();
 
     public List<Category> getAllCategories() {
-        return categories;
+        return new ArrayList<>(categories.values());
     }
 
-    public Optional<Category> getCategoryById(Long categoryId) {
-        return categories.stream().filter(category -> category.getId().equals(categoryId)).findFirst();
+    public Category addCategory(String name) {
+        Long id = categoryIdCounter.incrementAndGet();
+        Category category = new Category(id, name);
+        categories.put(id, category);
+        return category;
     }
 
-    public void addCategory(Category category) {
-        categories.add(category);
+    public Category getCategoryById(Long categoryId) {
+        return categories.get(categoryId);
     }
 
     public boolean deleteCategoryById(Long categoryId) {
-        Optional<Category> categoryToDelete = categories.stream()
-                .filter(category -> category.getId().equals(categoryId))
-                .findFirst();
-
-        if (categoryToDelete.isPresent()) {
-            categories.remove(categoryToDelete.get());
-            return true;
-        }
-        return false;
+        return categories.remove(categoryId) != null;
     }
 }

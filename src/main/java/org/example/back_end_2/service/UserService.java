@@ -5,26 +5,31 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class UserService {
-    private final List<User> users = new ArrayList<>();
+    private final Map<Long, User> users = new ConcurrentHashMap<>();
+    private final AtomicLong userIdCounter = new AtomicLong();
 
     public List<User> getAllUsers() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
-    public Optional<User> getUserById(Long userId) {
-        return users.stream().filter(user -> user.getId().equals(userId)).findFirst();
+    public User addUser(String name) {
+        Long id = userIdCounter.incrementAndGet();
+        User user = new User(id, name);
+        users.put(id, user);
+        return user;
     }
 
-    public void addUser(User user) {
-        users.add(user);
+    public User getUserById(Long id) {
+        return users.get(id);
     }
 
-    public void deleteUser(Long userId) {
-        users.removeIf(user -> user.getId().equals(userId));
+    public boolean deleteUser(Long id) {
+        return users.remove(id) != null;
     }
-
 }

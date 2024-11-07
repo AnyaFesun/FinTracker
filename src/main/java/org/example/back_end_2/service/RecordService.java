@@ -3,33 +3,35 @@ package org.example.back_end_2.service;
 import org.example.back_end_2.model.Record;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RecordService {
-    private List<Record> records = new ArrayList<>();
+    private final Map<Long, Record> records = new ConcurrentHashMap<>();
+    private final AtomicLong categoryIdCounter = new AtomicLong();
 
-    public List<Record> getAllRecords() {
-        return records;
+    public Record addRecord(Long userId, Long categoryId, Double costs) {
+        Long id = categoryIdCounter.incrementAndGet();
+        Record record = new Record(id, userId, categoryId, LocalDateTime.now(), costs);
+        records.put(id, record);
+        return record;
     }
 
-    public Optional<Record> getRecordById(Long recordId) {
-        return records.stream().filter(record -> record.getId().equals(recordId)).findFirst();
+    public Record getRecordById(Long id) {
+        return records.get(id);
     }
 
-    public void addRecord(Record record) {
-        records.add(record);
-    }
-
-    public void deleteRecord(Long recordId) {
-        records.removeIf(record -> record.getId().equals(recordId));
+    public boolean deleteRecord(Long id) {
+        return records.remove(id) != null;
     }
 
     public List<Record> getRecordsByUserAndCategory(Long userId, Long categoryId) {
-        return records.stream()
+        return records.values().stream()
                 .filter(record -> (userId == null || record.getUserId().equals(userId)) &&
                         (categoryId == null || record.getCategoryId().equals(categoryId)))
                 .collect(Collectors.toList());
