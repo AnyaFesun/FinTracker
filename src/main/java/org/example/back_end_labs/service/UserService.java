@@ -1,6 +1,6 @@
-package org.example.back_end_2.service;
+package org.example.back_end_labs.service;
 
-import org.example.back_end_2.model.User;
+import org.example.back_end_labs.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

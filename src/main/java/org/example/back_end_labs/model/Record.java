@@ -1,4 +1,4 @@
-package org.example.back_end_2.model;
+package org.example.back_end_labs.model;
 
 import java.time.LocalDateTime;
 import lombok.Setter;

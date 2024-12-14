@@ -1,7 +1,7 @@
-package org.example.back_end_2.controller;
+package org.example.back_end_labs.controller;
 
-import org.example.back_end_2.model.Category;
-import org.example.back_end_2.service.CategoryService;
+import org.example.back_end_labs.model.Category;
+import org.example.back_end_labs.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

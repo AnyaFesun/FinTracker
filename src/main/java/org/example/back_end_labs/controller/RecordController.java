@@ -1,7 +1,7 @@
-package org.example.back_end_2.controller;
+package org.example.back_end_labs.controller;
 
-import org.example.back_end_2.model.Record;
-import org.example.back_end_2.service.RecordService;
+import org.example.back_end_labs.model.Record;
+import org.example.back_end_labs.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
