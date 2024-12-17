@@ -1,10 +1,13 @@
 package org.example.back_end_labs.service;
 
 import org.example.back_end_labs.model.Record;
+import org.example.back_end_labs.repository.RecordRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -12,28 +15,34 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RecordService {
-    private final Map<Long, Record> records = new ConcurrentHashMap<>();
-    private final AtomicLong categoryIdCounter = new AtomicLong();
+    private final RecordRepository recordRepository;
 
-    public Record addRecord(Long userId, Long categoryId, Double costs) {
-        Long id = categoryIdCounter.incrementAndGet();
-        Record record = new Record(id, userId, categoryId, LocalDateTime.now(), costs);
-        records.put(id, record);
-        return record;
+    @Autowired
+    public RecordService(RecordRepository recordRepository) {
+        this.recordRepository = recordRepository;
+    }
+    public Record createRecord(Record record) {
+        record.setCreationDate(LocalDateTime.now());
+        return recordRepository.save(record);
     }
 
-    public Record getRecordById(Long id) {
-        return records.get(id);
+    public Optional<Record> getRecordById(Long id) {
+        return recordRepository.findById(id);
     }
 
-    public boolean deleteRecord(Long id) {
-        return records.remove(id) != null;
+    public void deleteRecord(Long id) {
+        recordRepository.deleteById(id);
     }
 
     public List<Record> getRecordsByUserAndCategory(Long userId, Long categoryId) {
-        return records.values().stream()
-                .filter(record -> (userId == null || record.getUserId().equals(userId)) &&
-                        (categoryId == null || record.getCategoryId().equals(categoryId)))
-                .collect(Collectors.toList());
+        if (userId != null && categoryId != null) {
+            return recordRepository.findByUser_IdAndCategory_Id(userId, categoryId);
+        } else if (userId != null) {
+            return recordRepository.findByUser_IdOrCategory_Id(userId, null);
+        } else if (categoryId != null) {
+            return recordRepository.findByUser_IdOrCategory_Id(null, categoryId);
+        } else {
+            return recordRepository.findAll();
+        }
     }
 }

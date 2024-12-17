@@ -1,35 +1,37 @@
 package org.example.back_end_labs.service;
 
 import org.example.back_end_labs.model.Category;
+import org.example.back_end_labs.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
-    private final Map<Long, Category> categories = new ConcurrentHashMap<>();
-    private final AtomicLong categoryIdCounter = new AtomicLong();
+    private final CategoryRepository categoryRepository;
 
-    public List<Category> getAllCategories() {
-        return new ArrayList<>(categories.values());
+    @Autowired
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
     }
 
     public Category addCategory(String name) {
-        Long id = categoryIdCounter.incrementAndGet();
-        Category category = new Category(id, name);
-        categories.put(id, category);
-        return category;
+        Category category = new Category();
+        category.setName(name);
+        return categoryRepository.save(category);
     }
 
-    public Category getCategoryById(Long categoryId) {
-        return categories.get(categoryId);
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 
-    public boolean deleteCategoryById(Long categoryId) {
-        return categories.remove(categoryId) != null;
+    public Optional<Category> getCategoryById(Long id) {
+        return categoryRepository.findById(id);
+    }
+
+    public void deleteCategoryById(Long id) {
+        categoryRepository.deleteById(id);
     }
 }
