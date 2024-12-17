@@ -3,6 +3,7 @@ package org.example.back_end_labs.controller;
 import org.example.back_end_labs.model.Category;
 import org.example.back_end_labs.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,13 +26,16 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public  Optional<Category> getCategoryById(@PathVariable Long categoryId) {
-        return Optional.ofNullable(categoryService.getCategoryById(categoryId));
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
+        return categoryService.getCategoryById(categoryId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{categoryId}")
-    public void deleteCategoryById(@PathVariable Long categoryId) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable Long categoryId) {
         categoryService.deleteCategoryById(categoryId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

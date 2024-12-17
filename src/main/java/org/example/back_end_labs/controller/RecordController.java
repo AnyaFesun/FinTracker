@@ -13,35 +13,44 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/record")
 public class RecordController {
-
     private final RecordService recordService;
 
     @Autowired
     public RecordController(RecordService recordService) {
         this.recordService = recordService;
     }
+
     @PostMapping
-    public ResponseEntity<Record> createRecord(@RequestParam Long userId, @RequestParam Long categoryId, @RequestParam Double costs) {
-        Record record = recordService.addRecord(userId, categoryId, costs);
-        return ResponseEntity.status(HttpStatus.CREATED).body(record);
+    public Record createRecord(@RequestBody Record record) {
+        return recordService.createRecord(record);
     }
 
     @GetMapping("/{recordId}")
-    public Optional<Record> getRecord(@PathVariable Long recordId) {
-        return Optional.ofNullable(recordService.getRecordById(recordId));
+    public ResponseEntity<Record> getRecordById(@PathVariable Long recordId) {
+        return recordService.getRecordById(recordId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{recordId}")
-    public void deleteRecord(@PathVariable Long recordId) {
+    public ResponseEntity<Void> deleteRecord(@PathVariable Long recordId) {
         recordService.deleteRecord(recordId);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public List<Record> getRecords(@RequestParam(required = false) Long userId,
-                                   @RequestParam(required = false) Long categoryId) {
-        if (userId == null && categoryId == null) {
-            throw new IllegalArgumentException("User ID or Category ID is required");
-        }
-        return recordService.getRecordsByUserAndCategory(userId, categoryId);
+    @GetMapping()
+    public ResponseEntity<List<Record>> getRecordsByUserAndCategory(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long categoryId) {
+        List<Record> records = recordService.getRecordsByUserAndCategory(userId, categoryId);
+        return ResponseEntity.ok(records);
     }
+//    @GetMapping
+//    public List<Record> getRecords(@RequestParam(required = false) Long userId,
+//                                   @RequestParam(required = false) Long categoryId) {
+//        if (userId == null && categoryId == null) {
+//            throw new IllegalArgumentException("User ID or Category ID is required");
+//        }
+//        return recordService.getRecordsByUserAndCategory(userId, categoryId);
+//    }
 }
