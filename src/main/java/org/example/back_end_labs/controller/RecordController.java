@@ -45,12 +45,4 @@ public class RecordController {
         List<Record> records = recordService.getRecordsByUserAndCategory(userId, categoryId);
         return ResponseEntity.ok(records);
     }
-//    @GetMapping
-//    public List<Record> getRecords(@RequestParam(required = false) Long userId,
-//                                   @RequestParam(required = false) Long categoryId) {
-//        if (userId == null && categoryId == null) {
-//            throw new IllegalArgumentException("User ID or Category ID is required");
-//        }
-//        return recordService.getRecordsByUserAndCategory(userId, categoryId);
-//    }
 }

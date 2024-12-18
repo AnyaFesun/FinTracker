@@ -14,7 +14,7 @@ services:
       - db
 
   db:
-    image: postgres
+    image: postgres:15.0
     container_name: postgres-container
     restart: always
     environment:
