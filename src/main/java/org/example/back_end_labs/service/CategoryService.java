@@ -23,15 +23,22 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+    public Category getCategoryById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category with ID " + categoryId + " not found."));
+    }
+
+    public void deleteCategoryById(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category with ID " + categoryId + " not found."));
+        categoryRepository.delete(category);
+    }
+
     public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
-    }
-
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
-    }
-
-    public void deleteCategoryById(Long id) {
-        categoryRepository.deleteById(id);
+        List<Category> categories = categoryRepository.findAll();
+        if (categories.isEmpty()) {
+            throw new IllegalStateException("No categories found.");
+        }
+        return categories;
     }
 }

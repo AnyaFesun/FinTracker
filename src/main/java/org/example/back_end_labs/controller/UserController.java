@@ -32,31 +32,31 @@ public class UserController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable Long userId) {
-        Optional<User> user = userService.getUserById(userId);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.");
+        try {
+            User user = userService.getUserById(userId);
+            return ResponseEntity.ok(user);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        Optional<User> user = userService.getUserById(userId);
-        if (user.isPresent()) {
+        try {
             userService.deleteUser(userId);
-            return ResponseEntity.ok( "User with ID " + userId + " deleted successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.\nUser cannot be deleted.");
+            return ResponseEntity.ok("User with ID " + userId + " deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        if (users.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No users found.");
+        try {
+            List<User> users = userService.getAllUsers();
+            return ResponseEntity.ok(users);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(users);
     }
 }

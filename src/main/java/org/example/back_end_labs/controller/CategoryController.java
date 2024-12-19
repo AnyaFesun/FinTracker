@@ -33,31 +33,31 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long categoryId) {
-        Optional<Category> category =  categoryService.getCategoryById(categoryId);
-        if (category.isPresent()) {
-            return ResponseEntity.ok(category.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with ID " + categoryId + " not found.");
+        try {
+            Category category = categoryService.getCategoryById(categoryId);
+            return ResponseEntity.ok(category);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<String> deleteCategoryById(@PathVariable Long categoryId) {
-        Optional<Category> category =  categoryService.getCategoryById(categoryId);
-        if (category.isPresent()) {
+    public ResponseEntity<?> deleteCategoryById(@PathVariable Long categoryId) {
+        try {
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.ok("Category with ID " + categoryId + " deleted successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category with ID " + categoryId + " not found.\nCategory cannot be deleted.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping
     public ResponseEntity<?> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        if (categories.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No categories found.");
+        try {
+            List<Category> categories = categoryService.getAllCategories();
+            return ResponseEntity.ok(categories);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(categories);
     }
 }

@@ -2,9 +2,7 @@ package org.example.back_end_labs.controller;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import org.example.back_end_labs.model.Category;
 import org.example.back_end_labs.model.Record;
-import org.example.back_end_labs.model.User;
 import org.example.back_end_labs.service.RecordService;
 import org.example.back_end_labs.service.UserService;
 import org.example.back_end_labs.service.CategoryService;
@@ -22,14 +20,10 @@ import org.springframework.http.ResponseEntity;
 @Validated
 public class RecordController {
     private final RecordService recordService;
-    private final UserService userService;
-    private final CategoryService categoryService;
 
     @Autowired
-    public RecordController(RecordService recordService, UserService userService, CategoryService categoryService) {
+    public RecordController(RecordService recordService) {
         this.recordService = recordService;
-        this.userService = userService;
-        this.categoryService = categoryService;
     }
 
     @PostMapping
@@ -38,42 +32,31 @@ public class RecordController {
             @RequestParam @NotNull(message = "Category ID cannot be null") Long categoryId,
             @RequestParam @NotNull(message = "Costs cannot be null")
             @Positive(message = "Costs must be a positive value") Double costs) {
-        Optional<User> user = userService.getUserById(userId);
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("User with ID " + userId + " does not exist.");
+        try {
+            Record createdRecord = recordService.createRecord(userId, categoryId, costs);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        Optional<Category> category = categoryService.getCategoryById(categoryId);
-        if (category.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Category with ID " + categoryId + " does not exist.");
-        }
-
-        Record record = new Record(user.get(), category.get(), costs);
-        Record createdRecord = recordService.createRecord(record);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord);
     }
-
 
     @GetMapping("/{recordId}")
     public ResponseEntity<?> getRecordById(@PathVariable Long recordId) {
-        Optional<Record> record = recordService.getRecordById(recordId);
-        if (record.isPresent()) {
-            return ResponseEntity.ok(record.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record with ID " + recordId + " not found.");
+        try {
+            Record record = recordService.getRecordById(recordId);
+            return ResponseEntity.ok(record);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{recordId}")
     public ResponseEntity<String> deleteRecord(@PathVariable Long recordId) {
-        Optional<Record> record = recordService.getRecordById(recordId);
-        if (record.isPresent()) {
-            recordService.deleteRecord(recordId);
+        try {
+            recordService.deleteRecordById(recordId);
             return ResponseEntity.ok("Record with ID " + recordId + " deleted successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Record with ID " + recordId + " not found.\nRecord cannot be deleted.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -81,14 +64,11 @@ public class RecordController {
     public ResponseEntity<?> getRecordsByUserAndCategory(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long categoryId) {
-        if (userId == null && categoryId == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You must provide at least one of the following parameters: userId or categoryId.");
+        try {
+            List<Record> records = recordService.getFilteredRecords(userId, categoryId);
+            return ResponseEntity.ok(records);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        List<Record> records = recordService.getRecordsByUserAndCategory(userId, categoryId);
-        if (records.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No records found for the given criteria.");
-        }
-        return ResponseEntity.ok(records);
     }
 }

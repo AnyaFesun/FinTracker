@@ -23,15 +23,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found."));
+    }
+
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found. User cannot be deleted."));
+        userRepository.delete(user);
+    }
+
     public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new IllegalStateException("No users found.");
+        }
+        return users;
     }
 }
