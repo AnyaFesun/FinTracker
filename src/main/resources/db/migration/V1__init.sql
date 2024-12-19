@@ -5,7 +5,7 @@ CREATE TABLE users (
 
 CREATE TABLE category (
                           id BIGSERIAL PRIMARY KEY,
-                          name VARCHAR(255) NOT NULL UNIQUE
+                          name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE records (
