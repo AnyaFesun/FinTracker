@@ -17,3 +17,10 @@ CREATE TABLE records (
                          CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                          CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE CASCADE
 );
+
+CREATE TABLE accounts (
+                          id BIGSERIAL PRIMARY KEY,
+                          user_id BIGINT NOT NULL UNIQUE,
+                          balance DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+                          CONSTRAINT fk_user_account FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
