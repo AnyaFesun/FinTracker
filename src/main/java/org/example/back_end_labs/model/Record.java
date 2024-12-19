@@ -3,6 +3,8 @@ package org.example.back_end_labs.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Getter;
@@ -35,5 +37,6 @@ public class Record {
         this.user = user;
         this.category = category;
         this.costs = costs;
+        this.creationDate = LocalDateTime.now();
     }
 }
