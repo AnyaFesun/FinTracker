@@ -4,9 +4,8 @@ import org.example.back_end_labs.model.Category;
 import org.example.back_end_labs.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Service
 public class CategoryService {
@@ -25,19 +24,19 @@ public class CategoryService {
 
     public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category with ID " + categoryId + " not found."));
+                .orElseThrow(() -> new NoSuchElementException("Category with ID " + categoryId + " not found."));
     }
 
     public void deleteCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category with ID " + categoryId + " not found."));
+                .orElseThrow(() -> new NoSuchElementException("Category with ID " + categoryId + " not found."));
         categoryRepository.delete(category);
     }
 
     public List<Category> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty()) {
-            throw new IllegalStateException("No categories found.");
+            throw new NoSuchElementException("No categories found.");
         }
         return categories;
     }

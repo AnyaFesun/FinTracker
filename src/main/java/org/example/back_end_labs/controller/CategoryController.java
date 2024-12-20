@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/category")
@@ -25,39 +23,24 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCategory(@RequestParam @NotBlank(message = "Category name cannot be empty")
+    public ResponseEntity<Category> createCategory(@RequestParam @NotBlank(message = "Category name cannot be empty")
                                        String name)  {
-        Category createdCategory = categoryService.addCategory(name);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(name));
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<?> getCategoryById(@PathVariable Long categoryId) {
-        try {
-            Category category = categoryService.getCategoryById(categoryId);
-            return ResponseEntity.ok(category);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(categoryService.getCategoryById(categoryId));
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<?> deleteCategoryById(@PathVariable Long categoryId) {
-        try {
-            categoryService.deleteCategoryById(categoryId);
-            return ResponseEntity.ok("Category with ID " + categoryId + " deleted successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<String> deleteCategoryById(@PathVariable Long categoryId) {
+        categoryService.deleteCategoryById(categoryId);
+        return ResponseEntity.ok("Category with ID " + categoryId + " deleted successfully.");
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllCategories() {
-        try {
-            List<Category> categories = categoryService.getAllCategories();
-            return ResponseEntity.ok(categories);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }

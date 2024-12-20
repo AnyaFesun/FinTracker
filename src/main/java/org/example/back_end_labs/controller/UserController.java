@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
@@ -24,39 +22,24 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> createUser(@RequestParam @NotBlank(message = "User name cannot be empty")
+    public ResponseEntity<User> createUser(@RequestParam @NotBlank(message = "User name cannot be empty")
                                             String name) {
-        User createdUser = userService.addUser(name);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(name));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
-        try {
-            User user = userService.getUserById(userId);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        try {
-            userService.deleteUser(userId);
-            return ResponseEntity.ok("User with ID " + userId + " deleted successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        userService.deleteUser(userId);
+        return ResponseEntity.ok("User with ID " + userId + " deleted successfully.");
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            List<User> users = userService.getAllUsers();
-            return ResponseEntity.ok(users);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }

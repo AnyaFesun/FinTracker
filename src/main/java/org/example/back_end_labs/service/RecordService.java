@@ -8,6 +8,7 @@ import org.example.back_end_labs.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class RecordService {
@@ -15,7 +16,6 @@ public class RecordService {
     private final CategoryService categoryService;
     private final AccountService accountService;
     private final RecordRepository recordRepository;
-
 
     @Autowired
     public RecordService(UserService userService, CategoryService categoryService,
@@ -29,7 +29,6 @@ public class RecordService {
     public Record createRecord(Long userId, Long categoryId, Double costs) {
         User user = userService.getUserById(userId);
         Category category = categoryService.getCategoryById(categoryId);
-
         Account account = accountService.getAccountByUserId(userId);
         if (!account.canWithdraw(costs)) {
             throw new IllegalArgumentException("Insufficient funds in account for user ID " + userId);
@@ -42,8 +41,9 @@ public class RecordService {
 
     public Record getRecordById(Long recordId) {
         return recordRepository.findById(recordId)
-                .orElseThrow(() -> new IllegalArgumentException("Record with ID " + recordId + " not found."));
+                .orElseThrow(() -> new NoSuchElementException("Record with ID " + recordId + " not found."));
     }
+
     public void deleteRecordById(Long recordId) {
         Record record = getRecordById(recordId);
         recordRepository.delete(record);
@@ -56,7 +56,7 @@ public class RecordService {
 
         List<Record> records = getRecordsByUserAndCategory(userId, categoryId);
         if (records.isEmpty()) {
-            throw new IllegalArgumentException("No records found for the given criteria.");
+            throw new NoSuchElementException("No records found for the given criteria.");
         }
         return records;
     }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class AccountService {
@@ -43,7 +44,7 @@ public class AccountService {
 
     public Account getAccountByUserId(Long userId) {
         return accountRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Account for user with ID " + userId + " does not exist."));
+                .orElseThrow(() -> new NoSuchElementException("Account for user with ID " + userId + " does not exist."));
     }
 
     public void deleteAccount(Long userId) {
@@ -54,7 +55,7 @@ public class AccountService {
     public List<Account> getAllAccounts() {
         List<Account> accounts = accountRepository.findAll();
         if (accounts.isEmpty()) {
-            throw new IllegalStateException("No users found.");
+            throw new NoSuchElementException("No accounts found.");
         }
         return accounts;
     }
