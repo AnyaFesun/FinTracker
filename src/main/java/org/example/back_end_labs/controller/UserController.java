@@ -1,45 +1,53 @@
 package org.example.back_end_labs.controller;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.Valid;
+import org.example.back_end_labs.component.JwtUtils;
 import org.example.back_end_labs.model.User;
+import org.example.back_end_labs.service.AccountService;
 import org.example.back_end_labs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/")
-@Validated
 public class UserController {
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
+    private final AccountService accountService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AccountService accountService) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+        this.accountService = accountService;
     }
 
-    @PostMapping("/user")
-    public ResponseEntity<User> createUser(@RequestParam @NotBlank(message = "User name cannot be empty")
-                                            String name) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(name));
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestParam String username, @RequestParam String password) {
+        userService.addUser(username, passwordEncoder.encode(password));
+
+        accountService.createAccount(userService.findByName(username).getId(), 0.0);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getUserById(userId));
-    }
+    @PostMapping("/login")
+    public ResponseEntity<Object> loginUser(@RequestParam String username, @RequestParam String password) {
+        User user = userService.findByName(username);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            String token = jwtUtils.generateJwtToken(user.getId());
 
-    @DeleteMapping("/user/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok("User with ID " + userId + " deleted successfully.");
-    }
-
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
+        }
     }
 }

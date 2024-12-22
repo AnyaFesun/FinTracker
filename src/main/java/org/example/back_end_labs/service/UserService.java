@@ -5,11 +5,9 @@ import org.example.back_end_labs.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -17,28 +15,23 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User addUser(String name) {
+    public void addUser(String username, String password) {
+        userRepository.findByName(username)
+                .ifPresent(existingAccount -> {
+                            throw new IllegalArgumentException("A user with this name already exists, " +
+                                    "please choose another name to register.");
+                });
         User user = new User();
-        user.setName(name);
-        return userRepository.save(user);
+        user.setName(username);
+        user.setPassword(password);
+        userRepository.save(user);
+    }
+
+    public User findByName(String name) {
+        return userRepository.findByName(name).orElse(null);
     }
 
     public User getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with ID " + userId + " not found."));
-    }
-
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with ID " + userId + " not found. User cannot be deleted."));
-        userRepository.delete(user);
-    }
-
-    public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        if (users.isEmpty()) {
-            throw new NoSuchElementException("No users found.");
-        }
-        return users;
+        return userRepository.findById(userId).orElse(null);
     }
 }
