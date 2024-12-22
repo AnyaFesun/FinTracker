@@ -2,8 +2,8 @@ package org.example.back_end_labs.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +21,7 @@ public class Record {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne
@@ -30,6 +31,7 @@ public class Record {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
+    @Positive(message = "Costs must be a positive value")
     @Column(nullable = false)
     private Double costs;
 

@@ -31,7 +31,7 @@ public class RecordService {
         Category category = categoryService.getCategoryById(categoryId);
         Account account = accountService.getAccountByUserId(userId);
         if (!account.canWithdraw(costs)) {
-            throw new IllegalArgumentException("Insufficient funds in account for user ID " + userId);
+            throw new IllegalArgumentException("Insufficient funds in account!");
         }
         account.withdraw(costs);
 
@@ -50,10 +50,6 @@ public class RecordService {
     }
 
     public List<Record> getFilteredRecords(Long userId, Long categoryId) {
-        if (userId == null && categoryId == null) {
-            throw new IllegalArgumentException("You must provide at least one of the following parameters: userId or categoryId.");
-        }
-
         List<Record> records = getRecordsByUserAndCategory(userId, categoryId);
         if (records.isEmpty()) {
             throw new NoSuchElementException("No records found for the given criteria.");
@@ -66,8 +62,6 @@ public class RecordService {
             return recordRepository.findByUser_IdAndCategory_Id(userId, categoryId);
         } else if (userId != null) {
             return recordRepository.findByUser_IdOrCategory_Id(userId, null);
-        } else if (categoryId != null) {
-            return recordRepository.findByUser_IdOrCategory_Id(null, categoryId);
         } else {
             return recordRepository.findAll();
         }

@@ -1,15 +1,12 @@
 package org.example.back_end_labs.controller;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import org.example.back_end_labs.model.Record;
-import org.example.back_end_labs.model.User;
 import org.example.back_end_labs.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 
@@ -25,9 +22,9 @@ public class RecordController {
     }
 
     @PostMapping
-    public ResponseEntity<Record> createRecord(@RequestParam Long userId, @RequestParam @NotNull Long categoryId,
-            @RequestParam @Positive(message = "Costs must be a positive value") Double costs) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(recordService.createRecord(userId, categoryId, costs));
+    public ResponseEntity<Record> createRecord(@RequestParam Long categoryId,
+                                               @RequestParam Double costs, @AuthenticationPrincipal String userId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(recordService.createRecord(Long.parseLong(userId), categoryId, costs));
     }
 
     @GetMapping("/{recordId}")
@@ -43,8 +40,8 @@ public class RecordController {
 
     @GetMapping
     public ResponseEntity<List<Record>> getRecordsByUserAndCategory(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Long categoryId) {
-        return ResponseEntity.ok(recordService.getFilteredRecords(userId, categoryId));
+            @RequestParam(required = false) Long categoryId,
+            @AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(recordService.getFilteredRecords(Long.parseLong(userId), categoryId));
     }
 }
