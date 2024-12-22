@@ -23,8 +23,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestParam @NotBlank(message = "Category name cannot be empty")
-                                       String name)  {
+    public ResponseEntity<Category> createCategory(@RequestParam String name)  {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(name));
     }
 

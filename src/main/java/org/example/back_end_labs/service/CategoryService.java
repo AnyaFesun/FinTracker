@@ -17,6 +17,11 @@ public class CategoryService {
     }
 
     public Category addCategory(String name) {
+        categoryRepository.findByName(name)
+            .ifPresent(existingAccount -> {
+                throw new IllegalArgumentException("This category already exists, please choose another name to create!");
+            });
+
         Category category = new Category();
         category.setName(name);
         return categoryRepository.save(category);

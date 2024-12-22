@@ -1,6 +1,7 @@
 package org.example.back_end_labs.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Getter;
@@ -15,7 +16,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Category name cannot be empty")
+    @Column(nullable = false, unique = true)
     private String name;
 
     public Category(Long id, String name) {
