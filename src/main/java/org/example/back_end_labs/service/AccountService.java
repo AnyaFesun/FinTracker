@@ -5,8 +5,6 @@ import org.example.back_end_labs.model.User;
 import org.example.back_end_labs.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -20,7 +18,7 @@ public class AccountService {
         this.userService = userService;
     }
 
-    public Account createAccount(Long userId, Double initialBalance) {
+    public void createAccount(Long userId, Double initialBalance) {
         User user = userService.getUserById(userId);
         accountRepository.findByUserId(userId)
                 .ifPresent(existingAccount -> {
@@ -28,13 +26,13 @@ public class AccountService {
                 });
 
         Account account = new Account(user, initialBalance);
-        return accountRepository.save(account);
+        accountRepository.save(account);
     }
 
-    public Account addFunds(Long userId, Double amount) {
+    public void addFunds(Long userId, Double amount) {
         Account account = getAccountByUserId(userId);
         account.addFunds(amount);
-        return accountRepository.save(account);
+        accountRepository.save(account);
     }
 
     public Double getBalance(Long userId) {
@@ -45,18 +43,5 @@ public class AccountService {
     public Account getAccountByUserId(Long userId) {
         return accountRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("Account for user with ID " + userId + " does not exist."));
-    }
-
-    public void deleteAccount(Long userId) {
-        Account account = getAccountByUserId(userId);
-        accountRepository.delete(account);
-    }
-
-    public List<Account> getAllAccounts() {
-        List<Account> accounts = accountRepository.findAll();
-        if (accounts.isEmpty()) {
-            throw new NoSuchElementException("No accounts found.");
-        }
-        return accounts;
     }
 }

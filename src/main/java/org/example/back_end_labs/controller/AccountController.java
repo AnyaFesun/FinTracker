@@ -1,13 +1,10 @@
 package org.example.back_end_labs.controller;
 
-import org.example.back_end_labs.model.Account;
 import org.example.back_end_labs.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/account")
@@ -19,29 +16,15 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestParam Long userId, @RequestParam Double initialBalance) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(userId, initialBalance));
-    }
-
     @PostMapping("/add-funds")
-    public ResponseEntity<Account> addFunds(@RequestParam Long userId, @RequestParam Double amount) {
-        return ResponseEntity.ok(accountService.addFunds(userId, amount));
+    public ResponseEntity<String> addFunds(@RequestParam Double amount, @AuthenticationPrincipal String userId) {
+        accountService.addFunds(Long.parseLong(userId), amount);
+        return ResponseEntity.ok("Your account has been successfully topped up with " + amount);
     }
 
-    @GetMapping("/balance/{userId}")
-    public ResponseEntity<Double> getBalance(@PathVariable Long userId) {
-        return ResponseEntity.ok(accountService.getBalance(userId));
+    @GetMapping("/balance")
+    public ResponseEntity<String> getBalance(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok("Your balance: " + accountService.getBalance(Long.parseLong(userId)));
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long userId) {
-        accountService.deleteAccount(userId);
-        return ResponseEntity.ok("Account for user with ID " + userId + " has been successfully deleted.");
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok(accountService.getAllAccounts());
-    }
 }
