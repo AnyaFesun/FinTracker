@@ -39,13 +39,18 @@ public class RecordService {
         return recordRepository.save(record);
     }
 
-    public Record getRecordById(Long recordId) {
-        return recordRepository.findById(recordId)
+    public Record getRecordById(Long recordId, Long userId) {
+        Record record = recordRepository.findById(recordId)
                 .orElseThrow(() -> new NoSuchElementException("Record with ID " + recordId + " not found."));
+        if (!record.getUser().getId().equals(userId)) {
+            throw new NoSuchElementException("Record with ID " + recordId + " not found in your requests!");
+        }
+
+        return record;
     }
 
-    public void deleteRecordById(Long recordId) {
-        Record record = getRecordById(recordId);
+    public void deleteRecordById(Long recordId, Long userId) {
+        Record record = getRecordById(recordId, userId);
         recordRepository.delete(record);
     }
 

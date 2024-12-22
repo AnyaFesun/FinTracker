@@ -28,13 +28,13 @@ public class RecordController {
     }
 
     @GetMapping("/{recordId}")
-    public ResponseEntity<Record> getRecordById(@PathVariable Long recordId) {
-        return ResponseEntity.ok(recordService.getRecordById(recordId));
+    public ResponseEntity<Record> getRecordById(@PathVariable Long recordId, @AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(recordService.getRecordById(recordId, Long.parseLong(userId)));
     }
 
     @DeleteMapping("/{recordId}")
-    public ResponseEntity<String> deleteRecord(@PathVariable Long recordId) {
-        recordService.deleteRecordById(recordId);
+    public ResponseEntity<String> deleteRecord(@PathVariable Long recordId, @AuthenticationPrincipal String userId) {
+        recordService.deleteRecordById(recordId, Long.parseLong(userId));
         return ResponseEntity.ok("Record with ID " + recordId + " deleted successfully.");
     }
 
