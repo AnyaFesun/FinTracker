@@ -1,11 +1,12 @@
 CREATE TABLE users (
                        id BIGSERIAL PRIMARY KEY,
-                       name VARCHAR(255) NOT NULL
+                       name VARCHAR(255) NOT NULL UNIQUE,
+                       password VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE category (
                           id BIGSERIAL PRIMARY KEY,
-                          name VARCHAR(255) NOT NULL
+                          name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE records (
